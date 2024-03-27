@@ -1,7 +1,7 @@
 ---
 
 import * as types from "../../types";
-import * as utils from "../scripts/utils";
+//import * as utils from "../scripts/utils";
 const locale = Astro.cookies.get("lang")?.value ?? "en";
 const all_strings = await Astro.glob(`../strings/*.ts`);
 const strings = all_strings.find(x => x.FrontMatter.code == locale) ?? all_strings[0];
