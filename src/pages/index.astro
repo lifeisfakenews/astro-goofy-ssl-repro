@@ -9,27 +9,25 @@ const strings = all_strings.find(x => x.FrontMatter.code == locale) ?? all_strin
 import { LinkCard, CardGrid } from "@astrojs/starlight/components";
 
 import Layout from "../layouts/Primary.astro";
-import TitleBar from "../layouts/TitleBar.astro";
-
 export const prerender = false;
 
-const user = await utils.loadUser(Astro);
-if (!user) {
-    if (Astro.url.host.includes("votemanager.xyz")) {
-        Astro.cookies.set("return_to", Astro.request.url, {
-            domain: ".votemanager.xyz",
-            maxAge: 1000 * 60 * 60 * 6/* 6 hours */
-        });
-    } else {
-        Astro.cookies.set("return_to", "https://integrations.votemanager.xyz", {
-            domain: ".votemanager.xyz",
-            maxAge: 1000 * 60 * 60 * 6/* 6 hours */
-        });
-    }
-    return Astro.redirect("https://auth.votemanager.xyz/login");
-} else if (!user.profile.isIntegrator && !user.profile.isStaff) {
-    return Astro.redirect("https://www.votemanager.xyz")
-};
+//const user = await utils.loadUser(Astro);
+//if (!user) {
+//    if (Astro.url.host.includes("votemanager.xyz")) {
+//        Astro.cookies.set("return_to", Astro.request.url, {
+//            domain: ".votemanager.xyz",
+//            maxAge: 1000 * 60 * 60 * 6/* 6 hours */
+//        });
+//    } else {
+//        Astro.cookies.set("return_to", "https://integrations.votemanager.xyz", {
+//            domain: ".votemanager.xyz",
+//            maxAge: 1000 * 60 * 60 * 6/* 6 hours */
+//        });
+//    }
+//    return Astro.redirect("https://auth.votemanager.xyz/login");
+//} else if (!user.profile.isIntegrator && !user.profile.isStaff) {
+//    return Astro.redirect("https://www.votemanager.xyz")
+//};
 
 ---
 
