@@ -5,7 +5,7 @@ const locale = Astro.cookies.get("lang")?.value ?? "en";
 const all_strings = await Astro.glob(`../strings/*.ts`);
 const strings = all_strings.find(x => x.FrontMatter.code == locale) ?? all_strings[0];
 
-import Setting from "../components/Footer/Setting.astro";
+import Setting from "../components/Setting.astro";
 
 export interface Props {
 }
