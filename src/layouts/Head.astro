@@ -1,0 +1,72 @@
+---
+
+import * as types from "../../types";
+const locale = Astro.cookies.get("lang")?.value ?? "en";
+const all_strings = await Astro.glob(`../strings/*.ts`);
+const strings = all_strings.find(x => x.FrontMatter.code == locale) ?? all_strings[0];
+
+export interface Props {
+    title: string;
+    description?: string;
+    icon?: string;
+}
+const { title, description = strings.SEO.description, icon } = Astro.props;
+
+---
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width" />
+    <meta name="generator" content={Astro.generator} />
+
+    <!-- SEO and that -->
+    <meta name="author" content="Vote Manager">
+    <meta name="title" content={title + " - VM Integrations"}>
+    <meta name="description" content={description}>
+    <meta name="keywords" content="Vote Manager">
+    <meta name="theme-color" content="#06c1c1">
+    <meta name="robots" content="noindex, nofollow">
+    <meta name="language" content="English">
+
+    <!-- Open Graph / Facebook -->
+    <meta property="og:locale" content="en_UK">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content={Astro.request.url}>
+    <meta property="og:site_name" content="Vote Manager">
+    <meta property="og:title" content={title + " - VM Integrations"}>
+    <meta property="og:description" content={description}>
+    <meta property="og:image" content={icon ?? "https://resources.votemanager.xyz/assets/banner.png"}>
+
+    <!-- Twitter -->
+    <meta property="twitter:card" content={icon ? "summary" : "summary_large_image"}>
+    <meta property="twitter:url" content={Astro.request.url}>
+    <meta property="twitter:title" content={title + " - VM Integrations"}>
+    <meta property="twitter:description" content={description}>
+    <meta property="twitter:image" content={icon ?? "https://resources.votemanager.xyz/assets/banner.png"}>
+
+    <title>{title} - VM Integrations</title>
+
+    <link rel="icon" href={icon ?? "https://resources.votemanager.xyz/assets/favicon.png"}>
+
+    <link rel="stylesheet" href="https://resources.votemanager.xyz/styles/global.css">
+    <link rel="stylesheet" href="/global.css">
+</head>
+
+<script>
+    type PreferenceEvent = Event & {
+        detail?: {
+            type: "theme" | "lang";
+            value: string;
+        }
+    }
+    document.addEventListener("vm_preference_update", (event:PreferenceEvent) => {
+        if (!event.detail) return;
+        document.cookie = `${event.detail.type}=${event.detail.value}; expires=${new Date(new Date().setFullYear(20000))}; domain=.votemanager.xyz; sameSite=Lax; path=/;`;
+        if (event.detail.type == "lang") {
+            location.reload();
+        } else if (event.detail.type == "theme") {
+            document.body.dataset.theme = event.detail.value;
+        };
+    });
+</script>

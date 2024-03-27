@@ -1,0 +1,59 @@
+---
+
+import * as types from "../../types";
+const locale = Astro.cookies.get("lang")?.value ?? "en";
+const all_strings = await Astro.glob(`../strings/*.ts`);
+const strings = all_strings.find(x => x.FrontMatter.code == locale) ?? all_strings[0];
+
+import Head from './Head.astro';
+import Header from './Header.astro';
+import Footer from './Footer.astro';
+
+export interface Props {
+    title: string;
+    description?: string;
+    icon?: string;
+}
+
+const { title, description, icon } = Astro.props;
+
+---
+
+<!DOCTYPE html>
+<html>
+    <Head title={title} description={description} icon={icon} />
+    <body>
+        <Header />
+        <main>
+            <slot />
+        </main>
+        <Footer />
+
+        <slot name="modals"/>
+    </body>
+</html>
+
+<style>
+    main {
+        --vm-container-max-width: 150rem;
+        margin-inline: auto;
+        padding: max(4rem, 5vw);
+        max-width: var(--vm-container-max-width);
+        width: 100%;
+    }
+    main > :first-child {
+        margin-top: 0;
+    }
+    main > :last-child {
+        margin-bottom: 0;
+    }
+</style>
+
+<script>
+    window.addEventListener("beforeunload", event => {
+        let url = new URL(document.URL);
+        if (url.hostname == "auth.votemanager.xyz") return;
+        let d = new Date(); d.setHours(d.getHours() + 6);
+        document.cookie = `return_to=${document.URL}; domain=votemanager.xyz; expires=${new Date(d)}; path=/; sameSite=Lax;`;
+    });
+</script>

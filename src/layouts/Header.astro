@@ -1,0 +1,254 @@
+---
+
+import * as types from "../../types";
+const locale = Astro.cookies.get("lang")?.value ?? "en";
+const all_strings = await Astro.glob(`../strings/*.ts`);
+const strings = all_strings.find(x => x.FrontMatter.code == locale) ?? all_strings[0];
+
+import Dropdown from '../components/Dropdown.astro';
+import Account from '../components/Header/Account.astro';
+
+export interface Props { }
+
+const { } = Astro.props;
+
+---
+
+<header>
+    <div>
+        <div class="flex v-center gap-200">
+            <h1>{strings.NavLinks.integrations}</h1>
+            <div class="flex v-center gap-200 push-right">
+                <button class="menu-toggle" aria-controls="primary-nav">
+                    <svg viewBox="-10 -10 120 120">
+                        <path d="m 20 40 h 60 a 1 1 0 0 1 0 20 h -60 a 1 1 0 0 1 0 -40 h 30 v 70" />
+                    <ul class="flex v-center">
+                        <li><a href="/docs">{strings.NavLinks.docs}</a></li>
+                    </ul>
+                </nav>
+                <div class="loader" aria-label={strings.Labels.loading_account_info}></div>
+                <div class="account">
+                    <Account />
+                </div>
+            </div>
+        </div>
+    </div>
+</header>
+
+<style>
+    header {
+        padding: 2rem;
+    }
+    header > div {
+        margin: 0 auto;
+        max-width: 100rem;
+        width: 100%;
+    }
+    h1 {
+        margin: 0;
+        font-family: var(--vm-ff-heading);
+        font-size: 2.5rem;
+        font-weight: 800;
+        color: var(--vm-clr-primary-400);
+    }
+
+    .menu-toggle {
+        background: transparent;
+        border: none;
+        position: relative;
+        z-index: 3;
+        cursor: pointer;
+        transition: .3s;
+    }
+    .menu-toggle svg {
+        display: block;
+        height: 3.5rem;
+        aspect-ratio: 1 / 1;
+        stroke: var(--vm-clr-text-100);
+        fill: none;
+        transition: .3s;
+    }
+    .menu-toggle path {
+        stroke-width: 10;
+        stroke-dasharray: 60 31 60 300;
+        stroke-linecap: round;
+        stroke-linejoin: round;
+        transition: 1s;
+    }
+    .menu-toggle[data-expanded="true"] {
+        translate: 0 -.3rem;
+    }
+    .menu-toggle[data-expanded="true"] svg {
+        rotate: 0.125turn;
+    }
+    .menu-toggle[data-expanded="true"] path {
+        stroke-dasharray: 60 105 60 300;
+        stroke-dashoffset: -90;
+    }
+
+    ul {
+        display: flex;
+        gap: 2.5rem;
+        list-style: none;
+    }
+    li a:not(.dropdown-item),
+    li :global(button:not(.dropdown-item)) {
+        background: transparent;
+        border: none;
+        padding: 0;
+        margin: 0;
+        display: flex;
+        align-items: center;
+        gap: .5rem;
+        font-family: var(--vm-ff-body);
+        font-size: 1.8rem;
+        font-weight: 400;
+        color: var(--vm-clr-text-200);
+        transition: 1s;
+    }
+    li a:not(.dropdown-item):is(:hover, :focus-visible),
+    li :global(button:not(.dropdown-item):is(:hover, :focus-visible)) {
+        text-decoration: none;
+    }
+
+    .loader {
+        position: relative;
+        display: block;
+        width: 4rem;
+        aspect-ratio: 1 / 1;
+    }
+    .loader::after {
+        content: "";
+        position: absolute;
+        inline-size: ;
+        inset: 0;
+        border-radius: 50%;
+        border-right: .4rem solid transparent;
+        border-top: .4rem solid var(--vm-clr-primary-400);
+        rotate: ;
+        animation: loader infinite 1s linear;
+    }
+    @keyframes loader {
+        from {rotate: 0deg}
+        to {rotate: 360deg}
+    }
+    .loader:not([style]) ~ .account {
+        display: none;
+    }
+    .account {
+        position: relative;
+        z-index: 3;
+    }
+
+    @media (min-width: 850px) {
+        .menu-toggle {
+            display: none;
+        }
+    }
+    @media (max-width: 850px) {
+        h1 ~ div {
+            gap: 0;
+        }
+        nav {
+            background: var(--vm-clr-body-600);
+            backdrop-filter: blur(1rem);
+            margin: 0;
+            padding-top: 4rem;
+            position: fixed;
+            z-index: 2;
+            top: 0;
+            right: 0;
+            height: 100vh;
+            width: 0;
+            transition: .5s;
+            overflow-x: hidden;
+        }
+        nav ul {
+            margin-inline: 1rem;
+            flex-direction: column;
+            align-items: start;
+            gap: .5rem;
+        }
+        nav li {
+            border-radius: .5rem;
+            padding: .5rem .8rem;
+            display: block;
+            width: 100%;
+            transition: .3s;
+        }
+        nav li:is(:hover, :focus-visible) {
+            background: var(--vm-clr-dark-800);
+        }
+        li a:not(.dropdown-item),
+        li :global(button:not(.dropdown-item)) {
+            font-size: 1.6rem;
+        }
+        nav a:is(:hover, :focus-visible) {
+            color: var(--vm-clr-primary-400);
+        }
+        nav li :global(.toggle) {
+            width: 100%;
+        }
+        nav li :global(i) {
+            margin-left: auto;
+        }
+        nav li :global(.dropdown) {
+            margin: -.5rem -.8rem;
+            padding: .5rem .8rem;
+            display: grid;
+            grid-template-rows: auto 0fr;
+            transition: .3s;
+            overflow: hidden;
+        }
+        nav li :global(.dropdown.show) {
+            background: var(--vm-clr-dark-800);
+            border-radius: .5rem;
+            grid-template-rows: auto 1fr;
+        }
+        nav li :global(.menu) {
+            background: transparent;
+            border-top: .1rem solid transparent;
+            border-radius: 0;
+            margin-top: -.5rem;
+            padding-top: .5rem;
+            box-shadow: none;
+            position: relative;
+            display: block;
+            width: 100%;
+        }
+        nav li :global(.dropdown.show .menu) {
+            border-top-color: var(--vm-clr-dark-600);
+            margin-top: 1rem;
+        }
+        nav li :global(.dropdown-item) {
+            border-radius: .5rem;
+            padding: .4rem .6rem;
+            transition: .3s;
+        }
+    }
+    @media (max-width: 300px) {
+        h1 {
+            display: none;
+        }
+    }
+</style>
+
+<script>
+    (document.querySelector("header .loader") as HTMLDivElement).style.display = "none";
+
+    document.querySelector("button.menu-toggle")?.addEventListener("click", x => {
+        const button = document.querySelector("button.menu-toggle") as HTMLButtonElement;
+        const nav = button.nextElementSibling as HTMLDivElement;
+        if (nav.dataset.expanded == "true") {
+            nav.dataset.expanded = "false";
+            button.dataset.expanded = "false";
+            nav.style.width = "0px";
+            nav.setAttribute("aria-expanded", "false");
+        } else {
+            nav.dataset.expanded = "true";
+            button.dataset.expanded = "true";
+            nav.style.width = screen.width < 350 ? `${screen.width}px` : "250px";
+            nav.setAttribute("aria-expanded", "true");
+        }
+    });
+</script>

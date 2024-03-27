@@ -1,0 +1,166 @@
+---
+
+import * as types from "../../types";
+const locale = Astro.cookies.get("lang")?.value ?? "en";
+const all_strings = await Astro.glob(`../strings/*.ts`);
+const strings = all_strings.find(x => x.FrontMatter.code == locale) ?? all_strings[0];
+
+import Setting from "../components/Footer/Setting.astro";
+
+export interface Props {
+}
+
+const { } = Astro.props;
+
+---
+<footer>
+    <div class="grid col2 even">
+        <div class="col flex">
+            <div class="footer-row-wrapper | flex dir-v gap-100">
+                <div class="footer-row | flex dir-v gap-100">
+                    <div class="brand">
+                        <div class="flex v-center gap-100">
+                            <img src="https://resources.votemanager.xyz/assets/favicon.png" alt="" />
+                        </div>
+                    </div>
+                    <div class="pref">
+                        <div class="flex dir-v gap-100">
+                            <Setting type="theme" value={Astro.cookies.get("theme")?.value ?? "sync"} />
+                            <Setting type="lang" value={strings.FrontMatter.code} />
+                        </div>
+                    </div>
+                </div>
+                <div class="push-down">
+                    <div class="legal">
+                        <p>
+                            &copy; {strings.General.footer_copyright} Thomas Owen 2022 - {new Date().getFullYear()}. {strings.General.footer_legal}.
+                            <br />
+                            {strings.General.footer_disclaimer}
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col">
+            <nav aria-label={strings.Labels.footer}>
+                <div class="grid col2 even">
+                    <div class="col">
+                        <h6>{strings.NavHeadings.vm}</h6>
+                        <ul class="flex dir-v gap-100">
+                            <li><a href="/premium">{strings.NavLinks.premium}</a></li>
+                            <li><a href="/features">{strings.NavLinks.features}</a></li>
+                            <li><a href="/commands">{strings.NavLinks.commands}</a></li>
+                            <li><a href="/templates">{strings.NavLinks.templates}</a></li>
+                            <li><a href="/platforms">{strings.NavLinks.platforms}</a></li>
+                            <li><a href="/integrations">{strings.NavLinks.integrations}</a></li>
+                            <li><a href="https://dashboard.votemanager.xyz/">{strings.NavLinks.dashboard}</a></li>
+                            <li data-footer-link-external><a target="_blank" href="/invite">{strings.NavLinks.invite}</a></li>
+                            <li data-footer-link-external><a target="_blank" href="/discord">{strings.NavLinks.discord}</a></li>
+                        </ul>
+                    </div>
+                    <div class="col">
+                        <h6>{strings.NavHeadings.resources}</h6>
+                        <ul class="flex dir-v gap-100">
+                            <li data-footer-link-external><a target="_blank" href="https://docs.votemanager.xyz">{strings.NavLinks.docs}</a></li>
+                            <li data-footer-link-external><a target="_blank" href="https://status.votemanager.xyz">{strings.NavLinks.status}</a></li>
+                            <li data-footer-link-external><a target="_blank" href="https://legal.votemanager.xyz/terms">{strings.NavLinks.tos}</a></li>
+                            <li data-footer-link-external><a target="_blank" href="https://legal.votemanager.xyz/privacy">{strings.NavLinks.privacy}</a></li>
+                            <li data-footer-link-external><a target="_blank" href="https://legal.votemanager.xyz/cookies">{strings.NavLinks.cookies}</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </nav>
+        </div>
+    </div>
+</footer>
+
+<style>
+    footer {
+        background: var(--vm-clr-body-600);
+        margin-top: auto;
+        padding: 4rem;
+    }
+    .brand img {
+        height: 6rem;
+    }
+    .brand p {
+        margin: 0;
+        line-height: 1;
+    }
+    .brand .name {
+        font-weight: 800;
+        font-size: 3rem;
+        color: var(--vm-clr-primary-400);
+    }
+    .brand .tagline {
+        font-size: 1.5rem;
+        font-weight: 300;
+    }
+    .pref {
+        margin-left: 7rem;
+        width: 50%;
+    }
+    .legal p {
+        margin: 0;
+        font-size: 1.5rem;
+        font-weight: 300;
+    }
+    
+    h6 {
+        margin-block: 1rem .5rem;
+        font-size: 2rem;
+        font-weight: 800;
+        color: var(--vm-clr-primary-600);
+    }
+    ul {
+        margin: 0;
+        list-style: none;
+    }
+    li {
+        display: flex;
+    }
+    li[data-footer-link-external]::after {
+        content: "\eb3e";
+        margin: auto .5rem auto auto;
+        font-family: "boxicons";
+    }
+    a {
+        color: var(--vm-clr-text-400);
+        font-weight: 300;
+        cursor: pointer;
+    }
+    a:is(:hover, :focus-visible) {
+        color: var(--vm-clr-text-200);
+        text-decoration: underline;
+    }
+
+    @media (max-width: 850px) {
+        footer > div {
+            display: flex;
+            flex-direction: column-reverse;
+            gap: 2rem;
+        }
+        .footer-row-wrapper {
+            width: 100%;
+        }
+        .legal p {
+            margin-top: 1rem;
+            text-align: center;
+            color: var(--vm-clr-text-600);
+        }
+    }
+    @media (max-width: 850px) and (min-width: 580px) {
+        .pref {
+            margin-left: 0;
+            width: auto;
+        }
+        .footer-row {
+            flex-direction: row;
+        }
+    }
+    @media (max-width: 460px) {
+        nav > .grid {
+            display: block;
+        }
+    }
+</style>
