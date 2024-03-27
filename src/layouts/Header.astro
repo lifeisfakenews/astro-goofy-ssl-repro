@@ -6,7 +6,7 @@ const all_strings = await Astro.glob(`../strings/*.ts`);
 const strings = all_strings.find(x => x.FrontMatter.code == locale) ?? all_strings[0];
 
 import Dropdown from '../components/Dropdown.astro';
-import Account from '../components/Header/Account.astro';
+import Account from '../components/Account.astro';
 
 export interface Props { }
 
