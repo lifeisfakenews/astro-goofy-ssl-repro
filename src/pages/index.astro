@@ -1,0 +1,45 @@
+---
+
+import * as types from "../../types";
+import * as utils from "../scripts/utils";
+const locale = Astro.cookies.get("lang")?.value ?? "en";
+const all_strings = await Astro.glob(`../strings/*.ts`);
+const strings = all_strings.find(x => x.FrontMatter.code == locale) ?? all_strings[0];
+
+import { LinkCard, CardGrid } from "@astrojs/starlight/components";
+
+import Layout from "../layouts/Primary.astro";
+import TitleBar from "../layouts/TitleBar.astro";
+
+export const prerender = false;
+
+const user = await utils.loadUser(Astro);
+if (!user) {
+    if (Astro.url.host.includes("votemanager.xyz")) {
+        Astro.cookies.set("return_to", Astro.request.url, {
+            domain: ".votemanager.xyz",
+            maxAge: 1000 * 60 * 60 * 6/* 6 hours */
+        });
+    } else {
+        Astro.cookies.set("return_to", "https://integrations.votemanager.xyz", {
+            domain: ".votemanager.xyz",
+            maxAge: 1000 * 60 * 60 * 6/* 6 hours */
+        });
+    }
+    return Astro.redirect("https://auth.votemanager.xyz/login");
+} else if (!user.profile.isIntegrator && !user.profile.isStaff) {
+    return Astro.redirect("https://www.votemanager.xyz")
+};
+
+---
+
+<Layout title={strings.NavLinks.integrations}>
+    <TitleBar title={strings.HomePage.title} description={strings.HomePage.description} />
+    <CardGrid>
+        <LinkCard title={strings.HomePage.card_integration_title} href="/integrations" description={strings.HomePage.card_integration_content} />
+        <LinkCard title={strings.HomePage.card_documentation_title} href="/docs" description={strings.HomePage.card_documentation_content} />
+    </CardGrid>
+</Layout>
+
+<style>
+</style>
