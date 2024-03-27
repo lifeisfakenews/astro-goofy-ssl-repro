@@ -1,0 +1,24 @@
+{
+  "name": "integrations",
+  "type": "module",
+  "version": "0.0.1",
+  "scripts": {
+    "dev": "astro dev",
+    "start": "astro dev",
+    "build": "astro check --minimumSeverity error && astro build",
+    "preview": "astro preview",
+    "astro": "astro"
+  },
+  "dependencies": {
+    "@astrojs/check": "^0.4.1",
+    "@astrojs/node": "^8.2.0",
+    "@astrojs/starlight": "^0.17.2",
+    "astro": "^4.2.1",
+    "sharp": "^0.32.5",
+    "tinycolor2": "^1.6.0",
+    "typescript": "^5.3.3"
+  },
+  "devDependencies": {
+    "@types/tinycolor2": "^1.4.6"
+  }
+}
