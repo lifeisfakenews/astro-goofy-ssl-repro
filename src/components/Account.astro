@@ -1,0 +1,82 @@
+---
+
+import * as types from "../../../types";
+const locale = Astro.cookies.get("lang")?.value ?? "en";
+const all_strings = await Astro.glob(`../../strings/*.ts`);
+const strings = all_strings.find(x => x.FrontMatter.code == locale) ?? all_strings[0];
+
+import Dropdown from "../Dropdown.astro";
+
+const token = Astro.cookies.get("auth")?.value ?? null;
+let userData:types.User|null = null;
+if (token) {
+    try {
+        userData = await fetch("https://webhooks.votemanager.xyz/api/users/@me", {
+            method: "POST",
+            headers: {
+                'Access-Control-Allow-Origin': '*',
+                'Authorization': token ?? "",
+                'Content-Type': 'application/json',
+                'Allow': 'application/json'
+            }
+        }).then(x => x.json());
+    } catch(e) {
+        console.log(e);
+        userData = null;
+    };
+};
+export interface Props {
+}
+
+export const prerender = false;
+
+const { } = Astro.props;
+
+---
+
+<div>
+    {userData ? <div>
+        <div class="dropdown" id="navUserDrop">
+            <button class="dropdown-toggle | nostyles" id="navUserButton" data-dropdown="valid-click" data-dropdown-button aria-label={strings.Labels.open_user_dropdown}>
+                <img src={`https://cdn.discordapp.com/avatars/${userData.discord.id}/${userData.discord.avatar}`} alt={strings.Labels.user_avatar} />
+                <i class="bx bx-chevron-down" data-dropdown-rotate></i>
+            </button>
+            <div class="dropdown-menu">
+                {userData.profile.isStaff ? <a href="https://integrations.votemanager.xyz/integrations/create" class="dropdown-item">{strings.NavLinks.create}</a> : ""}
+                <p class="dropdown-title">{strings.NavHeadings.general}</p>
+                <a href="https://beta.votemanager.xyz/leaderboards" class="dropdown-item">{strings.NavLinks.leaderboards}</a>
+                <a href="https://beta.votemanager.xyz/dashboard" class="dropdown-item">{strings.NavLinks.dashboard}</a>
+                <p class="dropdown-title">{strings.NavHeadings.requests}</p>
+                <a href="https://beta.votemanager.xyz/platforms/request" class="dropdown-item">{strings.NavLinks.request_platform}</a>
+                <a href="https://beta.votemanager.xyz/integrations/request" class="dropdown-item">{strings.NavLinks.request_integration}</a>
+                <p class="dropdown-title">{strings.NavHeadings.contribute}</p>
+                <a href="https://beta.votemanager.xyz/templates/new" class="dropdown-item">{strings.NavLinks.submit_template}</a>
+                <a href="https://paypal.me/YSXYASSER" class="dropdown-item" target="_blank" data-dropdown-external>{strings.NavLinks.donate}</a>
+                <hr class="dropdown-div" />
+                <a href="https://beta.votemanager.xyz/discord" class="dropdown-item" target="_blank" data-dropdown-external>{strings.NavLinks.support_server}</a>
+                <button class="dropdown-item" id="navUserLogoutButton">{strings.NavLinks.logout}</button>
+            </div>
+        </div>
+    </div> : <a href="https://auth.votemanager.xyz/login" class="login">{strings.NavLinks.login}</a>}
+</div>
+
+<div style="display: none;">
+    <Dropdown id="needthestylestoalwaysshowup" label="."/>
+</div>
+
+<style>
+    img {
+        border-radius: 50%;
+        display: block;
+        height: 4rem;
+        aspect-ratio: 1 / 1;
+        object-fit: cover;
+    }
+</style>
+
+<script>
+    document.querySelector("#navUserLogoutButton")?.addEventListener("click", () => {
+        document.cookie =`auth=; domain=votemanager.xyz; path=/; SameSite=Lax; expires=${new Date()};`;
+        document.location = "/";
+    });
+</script>

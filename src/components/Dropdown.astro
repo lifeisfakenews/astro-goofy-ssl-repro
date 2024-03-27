@@ -1,0 +1,158 @@
+---
+
+import * as types from "../../types";
+const locale = Astro.cookies.get("lang")?.value ?? "en";
+const all_strings = await Astro.glob(`../strings/*.ts`);
+const strings = all_strings.find(x => x.FrontMatter.code == locale) ?? all_strings[0];
+
+export interface Props {
+	id: string;
+	label?: string;
+	three_dots?: "true" | "false";
+}
+
+const { id, label = "", three_dots = "false" } = Astro.props;
+---
+
+<div class="dropdown" id={id + "Drop"}>
+	<button class="toggle | nostyles" id={id + "Button"} data-dropdown="valid-click" data-dropdown-button>
+		{three_dots == "true" ? <i class="bx bx-dots-vertical-rounded"></i> : (<span>{label}</span> <i class="bx bx-chevron-down" data-dropdown-rotate></i>)}
+	</button>
+	<div class="menu">
+		<slot/>
+	</div>
+</div>
+
+<script is:inline>
+	function dropdownLoadButtons() {
+		for (let x of document.querySelectorAll("[data-dropdown-button]")) {
+			if (x.dataset.dropdownInitilised == "true") continue;
+			x.addEventListener("click", (event) => {
+				if (!event.target.closest("[data-dropdown-button]")) return;
+				let dropdown = event.target.closest(".dropdown");
+				let remove = dropdown.classList.contains("show");
+				for (let x of document.querySelectorAll(".dropdown")) {
+					x.classList.remove("show");
+					x.setAttribute("aria-expanded", "false");
+				}
+				if (!remove) {
+					dropdown.classList.add("show");
+					dropdown.setAttribute("aria-expanded", "true");
+				}
+			});
+			x.dataset.dropdownInitilised = "true";
+		};
+	};
+</script>
+<script>
+	window.addEventListener("click", e => {
+		const target = e.target as HTMLElement;
+		const dropdown = target.closest(".dropdown") as HTMLDivElement;
+		for (let x of (document.querySelectorAll(".dropdown") as NodeListOf<HTMLDivElement>)) {
+			if (dropdown && dropdown.id == x.id && !target.closest(".dropdown-item")) continue; 
+			x.classList.remove("show");
+			x.setAttribute("aria-expanded", "false");
+		};
+	});
+	try {
+		/* @ts-ignore */
+		dropdownLoadButtons();
+	} catch(e) {console.log("Failed to load dropdowns")};
+</script>
+<style>
+	.dropdown, :global(.dropdown) {
+		position: relative;
+	}
+	.toggle, :global(.dropdown-toggle) {
+		display: flex;
+		align-items: center;
+		gap: .5rem;
+		color: var(--vm-clr-text-100);
+		cursor: pointer;
+	}
+	.toggle [data-dropdown-rotate],
+    :global(.dropdown-toggle [data-dropdown-rotate]) {
+		transition: .3s;
+		text-decoration: none;
+	}
+	.toggle [data-dropdown-rotate]:is(:hover, :focus-visible),
+    :global(.dropdown-toggle [data-dropdown-rotate]):is(:hover, :focus-visible) {
+		text-decoration: none;
+	}
+	.dropdown.show .toggle [data-dropdown-rotate],
+    :global(.dropdown.show .dropdown-toggle [data-dropdown-rotate]) {
+		rotate: 180deg;
+	}
+	.menu, :global(.dropdown-menu) {
+		background: var(--vm-clr-drop-400);
+		border-radius: .3rem;
+		box-shadow: 0 .5rem 1.6rem var(--vm-clr-dark-900);
+		margin: 0;
+		position: absolute;
+		right: 0;
+		z-index: 12000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000;
+        display: none;
+		min-width: 16rem;
+		width: max-content;
+		overflow: hidden;
+	}
+	:global(.dropdown-title) {
+		margin: .5rem 1.2rem .1rem;
+		display: block;
+		line-height: 1;
+		font-weight: 800;
+		font-family: var(--vm-ff-heading);
+		color: var(--vm-clr-primary-400);
+	}
+	:global(.dropdown-title:first-child) {
+		margin-top: 1rem;
+	}
+	:global(.dropdown-item) {
+		background: transparent;
+		border: none;
+		margin: 0;
+		padding: .4rem 1.2rem;
+		display: flex;
+		gap: .5rem;
+		align-items: center;
+		width: 100%;
+		font: inherit;
+		text-decoration: none;
+		text-align: left;
+		font-size: 1.5rem;
+		color: var(--vm-clr-text-400);
+		cursor: pointer;
+	}
+	:global(.dropdown-item:not([data-dropdown-external])) {
+		padding-right: 3rem;
+	}
+	:global(.dropdown-item[data-dropdown-style="danger"]) {
+		color: var(--vm-clr-danger-400);
+	}
+	:global(.dropdown-item[data-dropdown-external]::after) {
+        content: "\eb3e";
+        margin: auto 0 auto auto;
+		padding-left: 1rem;
+        font-family: "boxicons";
+	}
+	:global(.dropdown-item:is(:hover, :focus-visible)) {
+        background: var(--vm-clr-drop-800);
+        outline: none;
+		text-decoration: none;
+		color: var(--vm-clr-primary-400);
+	}
+	:global(.dropdown-item[data-dropdown-style="danger"]:is(:hover, :focus-visible)) {
+		color: var(--vm-clr-danger-400);
+	}
+	:global(.dropdown-div) {
+		background: var(--vm-clr-drop-800);
+		border: none;
+		border-radius: .2rem;
+		margin-block: 0;
+		height: .1rem;
+	}
+	.dropdown.show .menu,
+    :global(.dropdown.show .dropdown-menu) {
+		display: block;
+	}
+</style>

@@ -1,0 +1,152 @@
+---
+
+import * as types from "../../../types";
+const locale = Astro.cookies.get("lang")?.value ?? "en";
+const all_strings = await Astro.glob(`../../strings/*.ts`);
+const strings = all_strings.find(x => x.FrontMatter.code == locale) ?? all_strings[0];
+
+const themes = [
+    {label: strings.Themes.dark, value: "dark", image: "https://img.icons8.com/ios-glyphs/50/moon-symbol.png"},
+    {label: strings.Themes.light, value: "light", image: "https://img.icons8.com/material-sharp/50/sun--v1.png"},
+    {label: strings.Themes.sync, value: "sync", image: "https://img.icons8.com/ios-filled/50/black-and-white.png"},
+];
+const langs = all_strings.map(x => ({
+    value: x.FrontMatter.code,
+    label: x.FrontMatter.name,
+    image: `https://www.unknown.nu/flags/images/${x.FrontMatter.code}-100.png`
+}));
+
+export interface Props {
+    type: "theme" | "lang";
+    value: String;
+}
+
+interface SettingsOption {
+    label: string;
+    value: string;
+    icon?: string;
+    image?: string;
+}
+
+const { type, value } = Astro.props;
+
+const options = type == "theme" ? themes : langs;
+const selected = (options.find(x => x.value == value) ?? {value: `unknown-${Math.max(Math.random() * 1000)}`, icon: "bx-question-mark", label: "Select Something..."}) as SettingsOption;
+
+---
+
+<div data-footer-setting-type={type} data-footer-setting-state="closed">
+    <button class="v | nostyles flex v-center gap-050">
+        <div class="flex v-center gap-100" data-footer-setting-value={selected.value ?? `unknown-${Math.max(Math.random() * 1000)}`}>
+            <img src={selected.image} alt=""/>
+            <p>{selected.label}</p>
+        </div>
+        <i class="push-right | bx bx-chevron-down"></i>
+    </button>
+    <div class="o">
+        {options.map((x:SettingsOption) => <button class="nostyles flex v-center gap-200" data-footer-setting-value={x.value}>
+            <img src={x.image} alt=""/>
+            <p>{x.label}</p>
+        </button>)}
+    </div>
+</div>
+
+<style>
+    [data-footer-setting-type] {
+        position: relative;
+    }
+    [data-footer-setting-type="theme"] img {
+        filter: invert();
+    }
+    .v {
+        width: 100%;
+        cursor: pointer;
+    }
+    .v img {
+        border-radius: 50%;
+        width: 2rem;
+        aspect-ratio: 1 / 1;
+        object-fit: cover;
+    }
+    .v p {
+        color: var(--vm-clr-text-400);
+        font-weight: 300;
+    }
+    .v > i {
+        font-size: var(--vm-fs-500);
+        color: var(--vm-clr-text-400);
+        transition: .3s;
+    }
+    .v:is(:hover, :focus-visible, [data-footer-setting-state="open"] .v) :is(p, .v > i) {
+        color: var(--vm-clr-text-200);
+    }
+    [data-footer-setting-state="open"] .v > i {
+        rotate: 180deg;
+    }
+    .o {
+        background: var(--vm-clr-dark-900);
+        border-radius: .5rem;
+        overflow: hidden;
+        position: absolute;
+        inset: auto -1rem 100% -1rem;
+    }
+    .o button {
+        padding: .5rem 1rem;
+        display: flex;
+        width: 100%;
+        cursor: pointer;
+    }
+    .o button:hover {
+        background: var(--vm-clr-dark-800);
+    }
+    .o img {
+        border-radius: 50%;
+        width: 2rem;
+        aspect-ratio: 1 / 1;
+        object-fit: cover;
+    }
+    .o p {
+        font-weight: 300;
+        color: var(--vm-clr-text-200);
+    }
+    [data-footer-setting-type]:not([data-footer-setting-state="open"]) .o {
+        display: none;
+    }
+</style>
+
+<script>
+    document.querySelectorAll("[data-footer-setting-type] > button").forEach(x => {
+        x.addEventListener("click", () => {
+            const setting = x.closest("[data-footer-setting-type]") as HTMLDivElement;
+            if (!setting) return;
+            setting.dataset.footerSettingState = setting.dataset.footerSettingState == "open" ? "closed" : "open";
+        });
+    });
+    document.querySelectorAll("[data-footer-setting-type] .o").forEach(x => {
+        x.addEventListener("click", event => {
+            const option = (event.target as HTMLDivElement).closest("[data-footer-setting-type] .o button") as HTMLButtonElement;
+            if (!option) return;
+            const setting = option.closest("[data-footer-setting-type]") as HTMLDivElement;
+            if (!setting) return;
+            const preview = setting.querySelector(".v > div") as HTMLDivElement;
+            preview.innerHTML = option.innerHTML;
+            preview.dataset.footerSettingValue = option.dataset.footerSettingValue;
+            setting.dataset.footerSettingState = "closed";
+            const custom_event = new CustomEvent("vm_preference_update", {
+                detail: {
+                    type: setting.dataset.footerSettingType,
+                    value: option.dataset.footerSettingValue
+                }
+            });
+            document.dispatchEvent(custom_event);
+        });
+    });
+    document.addEventListener("click", event => {
+		let parent = (event.target as HTMLDivElement).parentElement as HTMLDivElement;
+        for (let x of (document.querySelectorAll("[data-footer-setting-type]") as NodeListOf<HTMLDivElement>)) {
+            if ((event.target as HTMLDivElement).closest("[data-footer-setting-type]") != x) {
+                x.dataset.footerSettingState = "closed";
+            };
+		};
+    });
+</script>
