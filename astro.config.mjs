@@ -8,9 +8,9 @@ export default defineConfig({
 	site: "https://integrations.votemanager.xyz",
 	integrations: [starlight({
 		title: "Integrations",
-		logo: {
-			src: "./public/favicon.png",
-		},
+		// logo: {
+			// src: "./public/favicon.png",
+		// },
 		// disable404Route: true,
 		sidebar: [
 			{label: "My Integrations", link: "/integrations/"},

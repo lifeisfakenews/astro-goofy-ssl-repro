@@ -2,10 +2,10 @@
 
 import * as types from "../../../types";
 const locale = Astro.cookies.get("lang")?.value ?? "en";
-const all_strings = await Astro.glob(`../../strings/*.ts`);
+const all_strings = await Astro.glob(`../strings/*.ts`);
 const strings = all_strings.find(x => x.FrontMatter.code == locale) ?? all_strings[0];
 
-import Dropdown from "../Dropdown.astro";
+import Dropdown from "./Dropdown.astro";
 
 const token = Astro.cookies.get("auth")?.value ?? null;
 let userData:types.User|null = null;
