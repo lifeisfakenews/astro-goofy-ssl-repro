@@ -1,0 +1,58 @@
+---
+
+import * as types from "../../types";
+
+// import IntegrationIcon from './IntegrationIcon.astro';
+
+export type Props = types.Integration;
+
+const { _id, name, description = "", icon = null } = Astro.props;
+
+---
+
+<article class="card | flex">
+	<a href={"/integrations/" + _id}>
+		<p class="name | flex">
+			<!-- {icon ? <img src={icon} alt="" class="icon" /> : <IntegrationIcon id={_id} size="3" />} -->
+            <img src={icon ?? "https://resources.votemanager.xyz/assets/favicon.png"} alt="" class="icon" />
+			<span set:html={name} />
+		</p>
+		<p class="description">{description}</p>
+	</a>
+</article>
+
+<style>
+	.card {
+		border: 1px solid var(--sl-color-gray-5);
+		background-color: var(--sl-color-black);
+		padding: clamp(1.6rem, calc(.2rem + 3vw), 4rem);
+		flex-direction: column;
+		justify-content: center;
+		gap: clamp(.8rem, calc(.2rem + 1vw), 1.6rem);
+		overflow: hidden;
+	}
+	.name {
+		font-weight: 600;
+		font-size: var(--sl-text-h4);
+		color: var(--sl-color-white);
+		line-height: var(--sl-line-height-headings);
+		gap: 1.6rem;
+		align-items: center;
+	}
+	.card .icon {
+		border-radius: .4rem;
+		display: block;
+		height: 3rem;
+		aspect-ratio: 1 / 1;
+	}
+	.description {
+		margin-block: 1rem 0;
+		white-space: nowrap;
+		text-overflow: ellipsis;
+		font-size: clamp(var(--sl-text-sm), calc(.8rem + 1vw), var(--sl-text-body));
+		overflow: hidden;
+	}
+	.description:empty {
+		display: none;
+	}
+</style>

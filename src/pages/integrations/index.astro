@@ -1,0 +1,105 @@
+---
+
+import * as types from "../../../types";
+// import * as utils from "../../scripts/utils";
+const locale = Astro.cookies.get("lang")?.value ?? "en";
+const all_strings = await Astro.glob(`../../strings/*.ts`);
+const strings = all_strings.find(x => x.FrontMatter.code == locale) ?? all_strings[0];
+
+import { CardGrid } from "@astrojs/starlight/components";
+
+import Layout from "../../layouts/Primary.astro";
+// import TitleBar from "../../layouts/TitleBar.astro";
+import IntegrationCard from "../../components/IntegrationCard.astro";
+
+export const prerender = false;
+
+// const user = await utils.loadUser(Astro);
+// if (!user) {
+//     if (Astro.url.host.includes("votemanager.xyz")) {
+//         Astro.cookies.set("return_to", Astro.request.url, {
+//             domain: ".votemanager.xyz",
+//             maxAge: 1000 * 60 * 60 * 6/* 6 hours */
+//         });
+//     } else {
+//         Astro.cookies.set("return_to", "https://integrations.votemanager.xyz", {
+//             domain: ".votemanager.xyz",
+//             maxAge: 1000 * 60 * 60 * 6/* 6 hours */
+//         });
+//     }
+//     return Astro.redirect("https://auth.votemanager.xyz/login");
+// } else if (!user.profile.isIntegrator && !user.profile.isStaff) {
+//     return Astro.redirect("https://www.votemanager.xyz")
+// };
+
+// const token = Astro.cookies.get("auth")?.value ?? null;
+// let integrations:types.Integration[] = [];
+// if (token) {
+//     try {
+//         integrations = await fetch(`https://webhooks.votemanager.xyz/api/integrations/list`, {
+//             method: "POST",
+//             headers: {
+//                 'Access-Control-Allow-Origin': '*',
+//                 'Authorization': token ?? "",
+//                 'Content-Type': 'application/json',
+//                 'Allow': 'application/json'
+//             }
+//         }).then(x => x.json());
+//     } catch(e) {
+//         console.log(e);
+//     };
+// };
+
+
+//this is fetched from mongo by the above API
+const integrations = [
+    {
+        "_id": "6788914c-1310-4634-8fd3-aa908ae8e3c6",
+        "created_by": "760170825629958184",
+        "owners": [
+            "963746571202224208"
+        ],
+        "api_token": "placeholder",
+        "name": "Test Integration",
+        "created_at": "1709984092098",
+        "__v": 0,
+        "description": "Super epic test integration for all this amazing testing we will be doing",
+        "icon": "https://cdn.votemanager.xyz/integrations/6788914c-1310-4634-8fd3-aa908ae8e3c6/icon.png",
+        "installable": true,
+        "provides": {
+            "tagscript": 2,
+            "rewards": 0
+        },
+        "public": false,
+        "testers": [
+            "121919449996460033"
+        ],
+        "accent_color": "#e74c3c",
+        "install_url": "https://install.url/long-complex-installation-oatuh2-url",
+        "scopes": [
+            "trackers.read",
+            "trackers.sensitive",
+            "trackers.write",
+            "trackers.delete",
+            "votes.read",
+            "users.*",
+            "users.premium"
+        ],
+        "authed_scopes": [],
+        "global_scopes": [
+            "trackers.create"
+        ]
+    }
+];
+//execpt its actually typed properly
+//the above is missing a few technically required fields but they arent actually need for this
+---
+
+<Layout title={strings.IntegrationsPage.title}>
+    <CardGrid>
+        {integrations.map(x => <IntegrationCard {...x as unknown as types.Integration} />)}
+    </CardGrid>
+</Layout>
+
+<style>
+</style>
