@@ -26,12 +26,12 @@ export default defineConfig({
 					directory: "docs/routes"
 				}
 			},
-			{
-				label: "Reference",
-				autogenerate: {
-					directory: "docs/reference"
-				}
-			},
+			// {
+			// 	label: "Reference",
+			// 	autogenerate: {
+			// 		directory: "docs/reference"
+			// 	}
+			// },
 		]
 	})],
 	output: "hybrid",
